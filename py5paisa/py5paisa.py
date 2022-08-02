@@ -455,7 +455,11 @@ class FivePaisaClient:
     
     def connect(self,wspayload:dict):
         try:
-            self.web_url=f'wss://openfeed.5paisa.com/Feeds/api/chat?Value1={self.Jwt_token}|{self.client_code}'
+            token = self.access_token
+            if not token:
+                token = self.Jwt_token
+                
+            self.web_url=f'wss://openfeed.5paisa.com/Feeds/api/chat?Value1={token}|{self.client_code}'
             
             def on_open(ws):
                 log_response("Streaming Started")
