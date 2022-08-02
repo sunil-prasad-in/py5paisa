@@ -139,6 +139,7 @@ class FivePaisaClient:
                 return_type = "Data"
             else:
                 raise Exception("Invalid data type requested")
+            HEADERS["Authorization"] = f'Bearer {self.access_token}'
             response = self.session.post(url, json=payload, headers=HEADERS).json()
 
             data = response["body"][return_type]
@@ -154,18 +155,12 @@ class FivePaisaClient:
             if req_type == "OP":
                 url = self.ORDER_PLACEMENT_ROUTE
                 #self.payload["head"]["requestCode"] = "5PPlaceOrdReq"
-                if self.access_token != "" :
-                    HEADERS["Authorization"] = f'Bearer {self.Jwt_token}'
             elif req_type == "OC":
                 url = self.ORDER_CANCEL_ROUTE
                 #self.payload["head"]["requestCode"] = "5PCancelOrdReq"
-                if self.access_token != "" :
-                    HEADERS["Authorization"] = f'Bearer {self.Jwt_token}'
             elif req_type == "OM":
                 url = self.ORDER_MODIFY_ROUTE
                 #self.payload["head"]["requestCode"] = "5PModifyOrdReq"
-                if self.access_token != "" :
-                    HEADERS["Authorization"] = f'Bearer {self.Jwt_token}'
             elif req_type == "OS":
                 url = self.ORDER_STATUS_ROUTE
                 self.payload["head"]["requestCode"] = "5POrdStatus"
@@ -517,8 +512,12 @@ class FivePaisaClient:
 
     def jwt_validate(self):
         try:
+            token = self.access_token
+            if not token:
+                token = self.Jwt_token
+                
             self.jwt_payload['ClientCode']=self.client_code
-            self.jwt_payload['JwtCode']=self.Jwt_token
+            self.jwt_payload['JwtCode']=token
             url=self.JWT_VALIDATION_ROUTE
             response = self.session.post(url, json=self.jwt_payload, headers=HEADERS).json()
             
@@ -529,11 +528,13 @@ class FivePaisaClient:
     def historical_data(self,Exch:str,ExchangeSegment:str,ScripCode: int,time: str,From:str,To: str):
         try:
             validation=self.jwt_validate()
-            
+            token = self.access_token
+            if not token:
+                token = self.Jwt_token            
             
             if validation=='Authorization Successful':
                 self.jwt_headers['x-clientcode']=self.client_code
-                self.jwt_headers['x-auth-token']=self.Jwt_token
+                self.jwt_headers['x-auth-token']=token
                 url=f'{self.HISTORICAL_DATA_ROUTE}{Exch}/{ExchangeSegment}/{ScripCode}/{time}?from={From}&end={To}'
                 timeList=['1m','5m','10m','15m','30m','60m','1d']
                 if time not in timeList:
@@ -647,7 +648,7 @@ class FivePaisaClient:
         
     def get_access_token(self,request_token):
         try:
-            self.payload["head"]["Key"] = self.USER_KEY
+            self.payload["head"]["key"] = self.USER_KEY
             self.payload["body"]["RequestToken"] = request_token
             self.payload["body"]["EncryKey"] = self.ENCRYPTION_KEY
             self.payload["body"]["UserId"] = self.USER_ID
