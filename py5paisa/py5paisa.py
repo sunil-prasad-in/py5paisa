@@ -362,7 +362,7 @@ class FivePaisaClient:
         Places a fresh order
         """
         try:
-            if(order['Price'] and order["ScripCode"] and order['Exchange'] and order['OrderType'] and order['Qty'] and order['ExchangeType']):
+            if(order['Price'] >= 0 and order["ScripCode"] and order['Exchange'] and order['OrderType'] and order['Qty'] and order['ExchangeType']):
                 self.set_payload(order)
                 return self.order_request("OP")
             else:
@@ -667,7 +667,9 @@ class FivePaisaClient:
             message = res["body"]["Message"]
             if message == "Success":
                 self.access_token = res["body"]["AccessToken"]
+                self.Jwt_token = self.access_token
                 self._set_client_code(res["body"]["ClientCode"])
+                log_response("Logged in!!")
                 return self.access_token
             else:
                 log_response(message)

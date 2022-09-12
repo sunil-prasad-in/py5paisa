@@ -30,11 +30,10 @@ Read the docs hosted [here](https://5paisa.github.io/)
 
 Get your API keys from https://invest.5paisa.com/DeveloperAPI/APIKeys
 
-Note:- We have deprecated the existing method which involved the use of keys.conf file.
-       Kindly go through this updated documentation.
+Note:- We have deprecated the existing method which involved the use of login credentials.
+       Kindly go through this updated documentation of using Access token for API Access.
 
-#### Authentication
-
+#### AUTHENTICATION USING OAUTH
 ```py
 from py5paisa import FivePaisaClient
 cred={
@@ -45,23 +44,18 @@ cred={
     "USER_KEY":"YOUR USERKEY",
     "ENCRYPTION_KEY":"YOUR ENCRYPTION_KEY"
     }
-
-client = FivePaisaClient(email="random_email@xyz.com", passwd="password", dob="YYYYMMDD",cred=cred)
-client.login()
-
-After successful authentication, you should get a `Logged in!!` message
-
-```
-
-#### OAUTH
-```py
-# *Need not use Login function if using Oauth flow to use APIs
-
 # First get a token by logging in to -> https://dev-openapi.5paisa.com/WebVendorLogin/VLogin/Index?VendorKey=<Your Vendor Key>&ResponseURL=<Redirect URL>
 
 # Pass the token received in the response url after successful login to get an access token (this also sets the token for all the APIs you use)-
 
+# Please note that you need to copy the request token from URL and paste in this code and start the code within 30s.
+
+#This function will automatically take care of generating and sending access token for all your API's
+
+client = FivePaisaClient(cred=cred)
 client.get_access_token('Your Response Token')
+
+After successful authentication, you should get a `Logged in!!` message
 ```
 
 #### Market Feed
@@ -120,7 +114,7 @@ Scrip Master - https://images.5paisa.com/website/scripmaster-csv-format.csv
 from py5paisa.order import Order, OrderType, Exchange
 
 #This is example of a commodity order. You can pass scripdata either you can pass scripcode also.
-
+# please use price = 0 for market Order
 #Using Scrip Data :-
 
 
